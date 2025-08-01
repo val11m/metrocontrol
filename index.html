@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MetroControl - Monitoreo de Unidades</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f9f9f9;
+      color: #222;
+    }
+
+    header {
+      background: #004d99;
+      color: white;
+      padding: 30px 15px;
+      text-align: center;
+    }
+
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-content img {
+      height: 80px;
+    }
+
+    .header-content h1 {
+      font-size: 2.5em;
+      margin: 0;
+    }
+
+    .header-content p {
+      font-size: 1.1em;
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    h2 {
+      color: #004d99;
+      text-align: center;
+      margin: 30px 0 20px;
+    }
+
+    .troncal-container {
+      max-width: 900px;
+      margin: 0 auto 30px;
+      padding: 0 15px;
+    }
+
+    .troncal-list {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .troncal-item {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #bbb;
+      padding: 20px;
+      width: 220px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      user-select: none;
+    }
+
+    .troncal-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 15px #004d99;
+    }
+
+    .troncal-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: center;
+      color: #004d99;
+    }
+
+    .estado {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .unidad {
+      background: #f4f4f4;
+      border-radius: 6px;
+      padding: 10px 15px;
+      box-shadow: inset 0 0 5px #ccc;
+    }
+
+    .unidad-header {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .barra-progreso {
+      height: 18px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .barra-llenado {
+      height: 100%;
+      width: 0;
+      transition: width 0.5s ease;
+    }
+
+    .verde {
+      background-color: #4CAF50;
+    }
+
+    .amarillo {
+      background-color: #FFC107;
+    }
+
+    .rojo {
+      background-color: #F44336;
+    }
+
+    .alerta {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #F44336;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .modal-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      max-width: 480px;
+      width: 90%;
+      padding: 20px 25px;
+      box-shadow: 0 0 20px #004d99;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      font-size: 22px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #004d99;
+    }
+
+    @media (max-width: 500px) {
+      .troncal-item {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <img src="thumbnail_image.png" alt="Logo MetroControl" />
+    <h1>MetroControl</h1>
+    <p>Sistema de monitoreo de unidades del Metro</p>
+  </div>
+</header>
+
+<section class="troncal-container">
+  <h2>Unidades y estaciones</h2>
+  <p style="text-align:center;">Haz clic en una unidad para ver su estado de ocupación:</p>
+  <div class="troncal-list">
+    <div class="troncal-item" data-capacity="80" data-current="45" data-unidad="Troncal T1 - Unidad 05">
+      <div class="troncal-title">Troncal T1 - Unidad 05</div>
+      <div>Estado: <span class="status-text">Medio</span></div>
+    </div>
+    <div class="troncal-item" data-capacity="80" data-current="80" data-unidad="Troncal T2 - Unidad 02">
+      <div class="troncal-title">Troncal T2 - Unidad 02</div>
+      <div>Estado: <span class="status-text">Lleno</span></div>
+    </div>
+    <div class="troncal-item" data-capacity="80" data-current="15" data-unidad="Troncal T3 - Unidad 10">
+      <div class="troncal-title">Troncal T3 - Unidad 10</div>
+      <div>Estado: <span class="status-text">Vacío</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <button class="modal-close" aria-label="Cerrar modal">&times;</button>
+    <h3 id="modal-title"></h3>
+    <div class="estado">
+      <div class="unidad">
+        <div class="unidad-header">Ocupación actual</div>
+        <div class="barra-progreso">
+          <div class="barra-llenado"></div>
+        </div>
+        <div class="ocupacion-text"></div>
+      </div>
+      <div class="alerta" style="display:none;">
+        🔔 ¡Alerta! Capacidad máxima alcanzada.
+      </div>
+    </div>
+  </div>
+</div>
+
+<audio id="alertSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
+
+<script>
+  function getEstadoOcupacion(current, max) {
+    const ratio = current / max;
+    if (ratio >= 1) return { color: 'rojo', texto: 'Lleno' };
+    if (ratio >= 0.7) return { color: 'amarillo', texto: 'Casi lleno' };
+    if (ratio > 0) return { color: 'verde', texto: 'Medio' };
+    return { color: 'verde', texto: 'Vacío' };
+  }
+
+  const troncalItems = document.querySelectorAll('.troncal-item');
+  const modalBg = document.querySelector('.modal-bg');
+  const modalTitle = modalBg.querySelector('#modal-title');
+  const barraLlenado = modalBg.querySelector('.barra-llenado');
+  const ocupacionText = modalBg.querySelector('.ocupacion-text');
+  const alerta = modalBg.querySelector('.alerta');
+  const alertSound = document.getElementById('alertSound');
+  const modalCloseBtn = modalBg.querySelector('.modal-close');
+
+  troncalItems.forEach(item => {
+    item.addEventListener('click', () => abrirModal(item));
+  });
+
+  modalCloseBtn.addEventListener('click', cerrarModal);
+  modalBg.addEventListener('click', e => {
+    if (e.target === modalBg) cerrarModal();
+  });
+
+  function abrirModal(item) {
+    const unidad = item.dataset.unidad;
+    const maxCap = parseInt(item.dataset.capacity);
+    const currentCap = parseInt(item.dataset.current);
+
+    modalTitle.textContent = unidad;
+    const estado = getEstadoOcupacion(currentCap, maxCap);
+
+    barraLlenado.style.width = `${(currentCap / maxCap) * 100}%`;
+    barraLlenado.className = `barra-llenado ${estado.color}`;
+
+    ocupacionText.textContent = `${currentCap} de ${maxCap} personas`;
+
+    if (estado.color === 'rojo' || estado.color === 'amarillo') {
+      alerta.style.display = 'flex';
+      alertSound.play().catch(() => {});
+    } else {
+      alerta.style.display = 'none';
+      alertSound.pause();
+      alertSound.currentTime = 0;
+    }
+
+    modalBg.style.display = 'flex';
+    modalCloseBtn.focus();
+  }
+
+  function cerrarModal() {
+    modalBg.style.display = 'none';
+    alertSound.pause();
+    alertSound.currentTime = 0;
+  }
+</script>
+
+</body>
+</html>
